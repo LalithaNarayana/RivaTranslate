@@ -1,0 +1,54 @@
+// Copyright (c) 2022, NVIDIA CORPORATION.  All rights reserved.
+//
+// NVIDIA CORPORATION and its licensors retain all intellectual property
+// and proprietary rights in and to this software, related documentation
+// and any modifications thereto.  Any use, reproduction, disclosure or
+// distribution of this software and related documentation without an express
+// license agreement from NVIDIA CORPORATION is strictly prohibited.
+
+syntax = "proto3";
+
+package nvidia.riva.nmt;
+
+option cc_enable_arenas = true;
+option objc_class_prefix = "RRNMT";
+
+service RivaTranslation {
+  // Translate text from one language to another.
+  rpc TranslateText(TranslateTextRequest) returns (TranslateTextResponse) {}
+  // Returns the list of language codes supported by the model.
+  rpc ListSupportedLanguagePairs(SupportedLanguagePairsRequest) returns (SupportedLanguagePairsResponse) {}
+}
+
+message TranslateTextRequest {
+  // The text to translate. Multiple texts can be submitted in one request.
+  repeated string texts = 1;
+  // Model name to use for translation.
+  string model = 2;
+  // Source language code, typically a two-letter ISO code such as "en".
+  string source_language = 3;
+  // Target language code, typically a two-letter ISO code such as "de".
+  string target_language = 4;
+}
+
+message Translation {
+  string text = 1;
+}
+
+message TranslateTextResponse {
+  repeated Translation translations = 1;
+}
+
+message SupportedLanguagePairsRequest {
+  // If empty, return all available text translation models and language pairs.
+  string model = 1;
+}
+
+message LanguagePair {
+  repeated string src_lang = 1;
+  repeated string tgt_lang = 2;
+}
+
+message SupportedLanguagePairsResponse {
+  map<string, LanguagePair> languages = 1;
+}
