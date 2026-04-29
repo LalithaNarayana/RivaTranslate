@@ -1,0 +1,38 @@
+services:
+  # ── Backend: Express + gRPC proxy ──────────────────────────────────────────
+  - type: web
+    name: rivatranslate-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: NVIDIA_API_KEY
+        sync: false          # ← you will paste the real value in Render dashboard
+      - key: RIVA_SERVER
+        value: grpc.nvcf.nvidia.com:443
+      - key: RIVA_FUNCTION_ID
+        value: 0778f2eb-b64d-45e7-acae-7dd9b9b35b4d
+      - key: RIVA_MODEL
+        value: ""            # leave blank = auto-resolve
+      - key: FRONTEND_URL
+        sync: false          # ← paste your Render frontend URL after first deploy
+
+  # ── Frontend: React static site ────────────────────────────────────────────
+  - type: web
+    name: rivatranslate-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        sync: false          # ← paste your Render backend URL after first deploy
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

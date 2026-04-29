@@ -1,3 +1,5 @@
+// ADD this as the first line:
+import API_BASE_URL from './config';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 // ─── Language list ────────────────────────────────────────────────────────────
@@ -606,7 +608,7 @@ export default function App() {
 
   // Check backend health on mount
   useEffect(() => {
-    fetch('/api/health')
+    fetch(`${API_BASE_URL}/api/health`)
       .then(r => r.json())
       .then(data => {
         if (data.apiKeyConfigured) {
@@ -631,7 +633,7 @@ export default function App() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/translate', {
+      const res = await fetch(`${API_BASE_URL}/api/translate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, sourceLang: src, targetLang: tgt }),

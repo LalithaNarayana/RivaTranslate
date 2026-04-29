@@ -154,3 +154,34 @@ grpc.nvcf.nvidia.com:443
 | `RIVA_SERVER` | gRPC endpoint | `grpc.nvcf.nvidia.com:443` |
 | `RIVA_FUNCTION_ID` | NIM function ID | `0778f2eb-...` |
 | `PORT` | Backend HTTP port | `3001` |
+
+
+## Deploying to Render
+
+### Step 1 — Push to GitHub
+Make sure `backend/.env` is NOT committed (it's in `.gitignore`).
+Push the repo to GitHub.
+
+### Step 2 — Create services on Render
+Go to https://render.com → New → Blueprint → connect your repo.
+Render will read `render.yaml` and create both services automatically.
+
+### Step 3 — Set secret environment variables
+In the Render dashboard, for the **backend** service, set:
+- `NVIDIA_API_KEY` → your `nvapi-...` key
+
+### Step 4 — Link frontend ↔ backend
+After first deploy, copy the backend URL (e.g. `https://rivatranslate-backend.onrender.com`) and set it as:
+- Backend service → `FRONTEND_URL` = `https://rivatranslate-frontend.onrender.com`
+- Frontend service → `REACT_APP_API_URL` = `https://rivatranslate-backend.onrender.com`
+
+Then trigger a **manual redeploy** of both services.
+
+### Architecture on Render
+```
+Browser → rivatranslate-frontend.onrender.com (static site)
+               ↓ REACT_APP_API_URL
+          rivatranslate-backend.onrender.com (Node web service)
+               ↓ gRPC + TLS
+          grpc.nvcf.nvidia.com:443 (NVIDIA Riva)
+```

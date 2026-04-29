@@ -6,7 +6,21 @@ const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
 const app = express();
-app.use(cors());
+// ADD THIS instead:
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(',').map(o => o.trim())
+  : ['http://localhost:3000'];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // allow requests with no origin (curl, Render health checks)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS blocked: ${origin}`));
+  },
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
 app.use(express.json());
 
 const PROTO_PATH = path.join(__dirname, 'proto', 'riva_nmt.proto');
